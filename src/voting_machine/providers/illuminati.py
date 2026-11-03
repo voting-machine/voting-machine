@@ -35,7 +35,7 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
     headers = {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + api_key,
-        "User-Agent": "Name-of-the-Machine"
+        "User-Agent": "Voting-Machine"
     }
 
     # Receive the instruction

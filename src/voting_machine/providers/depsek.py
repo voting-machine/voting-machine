@@ -14,9 +14,9 @@ from os import environ
 def respond(messages, instructions, **kwargs):
     """
     """
-    api_key = environ.get("OPENRO_API_KEY")
-    api_base = environ.get("OPENRO_API_BASE", "https://openrouter.ai/api/v1")
-    default_model = environ.get("OPENRO_DEFAULT_MODEL", "openai/gpt-6-luna")
+    api_key = environ.get("DEPSEK_API_KEY")
+    api_base = environ.get("DEPSEK_API_BASE", "https://api.deepseek.com")
+    default_model = environ.get("DEPSEK_DEFAULT_MODEL", "deepseek-flash")
 
     instruction = kwargs.get('system_instruction', instructions)
     first_message = [dict(role='system', content=instruction)] if instruction else []
@@ -29,15 +29,11 @@ def respond(messages, instructions, **kwargs):
     payload = {
         "model":            kwargs.get("model", default_model),
         "messages":         instruction_and_contents,
-        "max_tokens":       kwargs.get("max_tokens", 128000),
+        "max_tokens":       kwargs.get("max_tokens", 64000),
         "temperature":      kwargs.get("temperature", 1.0),
-        "reasoning_effort": kwargs.get("reasoning_effort", "high"),
-        "response_format": {
-            "type": "text"
-        },
-        "stream": False,
-        "reasoning": {
-          "enabled": True
+        "reasoning_effort": kwargs.get("reasoning_effort", "max"),
+        "thinking": {
+            "type": "enabled"
         }
     }
 
@@ -48,7 +44,7 @@ def respond(messages, instructions, **kwargs):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
-        "User-Agent": "Name-of-the-Machine"
+        "User-Agent": "Voting-Machine"
     }
 
     # Create the Request object
@@ -60,12 +56,12 @@ def respond(messages, instructions, **kwargs):
 
     try:
         # Execute the request
-        with urllib.request.urlopen(req, timeout=3000) as response:
+        with urllib.request.urlopen(req, timeout=300) as response:
             response_data = response.read().decode('utf-8')
             output = json.loads(response_data)
             message = output['choices'][0]['message']
-            text = message.get('content', '')
-            thoughts = message.get('reasoning', '')
+            text = message['content']
+            thoughts = message['reasoning_content']
 
         return thoughts, text
 
